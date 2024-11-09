@@ -153,10 +153,10 @@ def process_receipt(image_file):
     image_file.save(temp_path)
 
     # Preprocess the image
-    temp_path = preprocess_image(temp_path)
+    processed_img_temp_path = preprocess_image(temp_path)
 
     # Upload the image to Gemini
-    uploaded_image = genai.upload_file(temp_path)
+    uploaded_image = genai.upload_file(processed_img_temp_path)
 
     # Create a Gemini model instance
     model = genai.GenerativeModel(
@@ -186,6 +186,7 @@ def process_receipt(image_file):
     result = model.generate_content([uploaded_image, "\n\n", prompt])
 
     # Remove the temporary file after uploading
+    os.remove(processed_img_temp_path)
     os.remove(temp_path)
 
     # Convert the result text to JSON
