@@ -8,6 +8,7 @@ import json
 import imutils
 import cv2
 import numpy as np
+import matplotlib.pyplot as plt
 
 load_dotenv()
 
@@ -138,11 +139,12 @@ def preprocess_image(image_path):
 
     # Enhance text in the cropped or rotated image
     enhanced = enhance_txt(cropped)
+    enhanced_rgb = cv2.cvtColor(enhanced, cv2.COLOR_BGR2RGB)
 
     # Save the enhanced image to a temporary file
     filename = secure_filename(os.path.basename(image_path + "_enhanced.jpg"))
     temp_path = os.path.join('/tmp', filename)
-    cv2.imwrite(temp_path, enhanced)
+    plt.imsave(temp_path, enhanced_rgb)
     return temp_path
 
 
