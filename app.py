@@ -168,7 +168,6 @@ def process_receipt(image_file):
 
     prompt = """
     Analyze the following image of a grocery store receipt, which may be in Thai or English:
-
     [Image]
 
     **Note:** The receipt image has been preprocessed to improve readability, including enhancing text contrast and reducing noise. Any faded text or low-contrast areas are likely adjusted for better clarity.
@@ -176,8 +175,16 @@ def process_receipt(image_file):
     **Focus on identifying and extracting information for items that are likely ingredients.** For each ingredient:
 
     1. **Ingredient Name:** The name of the product or ingredient.
-    2. **Price:** The price of the item.
-    3. **Quantity:** The quantity purchased.
+    2. **Price:** The price of the item in Thai Baht (฿).
+    - **If the price is in a foreign currency (e.g., $, €, £):**
+        1. Extract the numerical value.
+        2. Use a reliable currency conversion API to get the current exchange rate.
+        3. Convert the numerical value to Thai Baht.
+        4. Format the result as a string with only number in the string.
+    - **If the price is in Thai Baht or without a currency symbol:**
+        1. Extract the numerical value.
+        2. Format the result as a string with only number in the string.
+    3. **Quantity:** The quantity purchased, as an integer string. If not explicitly stated, estimate the quantity based on image analysis or textual cues.
 
     **Exclude non-ingredient items** like taxes, subtotal, total, store name, date, etc.
 
@@ -203,7 +210,7 @@ def hello_world():
     return "<p>Welcome to BakingUp Receipt Scanner</p>"
 
 
-@app.route('/scan_receipt', methods=['GET'])
+@app.route('/scan_receipt', methods=['POST'])
 def scan_receipt():
     if 'file' not in request.files:
         return jsonify({'error': 'No file part'}), 400
